@@ -1,15 +1,15 @@
-print("Hello world!")
-
+"""A simple app to report the CPU temperature of my raspberry pi"""
 from fastapi import FastAPI
 
 
 def read_temperature():
-    f = open("/sys/class/thermal/thermal_zone0/temp", "r")
+    """Read CPU temperature"""
+    file = open("/sys/class/thermal/thermal_zone0/temp", "r")
     value = 0
     try:
-        value = int(f.read())
+        value = int(file.read())
         value = value / 1000
-    except:
+    except Exception:
         pass
     return value
 
@@ -19,7 +19,7 @@ read_temperature()
 
 @app.get("/")
 async def root():
-    t = read_temperature()
+    temperature_cpu = read_temperature()
     return {
-        "temperature_cpu": t
+        "temperature_cpu": temperature_cpu
     }
