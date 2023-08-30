@@ -1,0 +1,27 @@
+{% block content %}
+{% include "base.html" %}
+
+<div class="container-fluid">
+  <h2>Information</h2>
+
+  <table class="table">
+    <thead>
+      <tr>
+        <th scope="col">Key</th>
+        <th scope="col" class="w-75">Value</th>
+      </tr>
+    </thead>
+    <tbody>
+
+      {% for key, value in data.items() %}
+        <tr>
+          <td><b>{{key}}</b></td>
+          <td>{{value}}</td>
+        </tr>
+      {% endfor %}
+      
+    </tbody>
+  </table>
+</div>
+
+{% endblock %}
