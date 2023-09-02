@@ -2,6 +2,9 @@
 import argparse
 import random
 import uvicorn
+import time
+import threading
+from datetime import datetime
 from fastapi import FastAPI
 from fastapi import Request
 #from fastapi import WebSocket
@@ -19,6 +22,25 @@ app.mount(
     name="static",
 )
 
+data_buffer = []
+running = True
+sleep_time_seconds = 60*5
+
+def thread_get_data():
+    global running
+    global sleep_time_seconds
+    global data_buffer
+
+    while running:
+        now = datetime.now()
+        dt_string = now.strftime("%d.%m.%Y %H:%M:%S")
+        local_buffer = {
+            "temperature_cpu": read_temperature(),
+            "timestamp": dt_string
+        }
+        data_buffer = data_buffer[-4320:]
+        data_buffer.append(local_buffer)
+        time.sleep(sleep_time_seconds)
 
 def read_temperature():
     """Read CPU temperature"""
@@ -45,10 +67,12 @@ def home(request: Request):
 
 @app.get("/info", response_class=HTMLResponse)
 def info(request: Request):
-    data = {"temperature_cpu": read_temperature()}
+    global data_buffer
     return templates.TemplateResponse(
-        "info.html",
-        {"request": request, "data": data}
+        "info.html", {
+            "request": request,
+            "data_buffer": data_buffer
+        }
     )
 
 def main():
@@ -62,6 +86,9 @@ def main():
     is_mock = args.mock
 
     print(f"Using args: {args}")
+
+    x = threading.Thread(target=thread_get_data, args=())
+    x.start()
 
     if args.debug:
         uvicorn.run(app, port=3002, host="0.0.0.0", log_level="debug")
