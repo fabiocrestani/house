@@ -24,7 +24,7 @@ app.mount(
 
 data_buffer = []
 running = True
-sleep_time_seconds = 60*5
+sleep_time_seconds = 1
 
 def thread_get_data():
     global running
@@ -38,7 +38,7 @@ def thread_get_data():
             "temperature_cpu": read_temperature(),
             "timestamp": dt_string
         }
-        data_buffer = data_buffer[-4320:]
+        data_buffer = data_buffer[-200:]
         data_buffer.append(local_buffer)
         time.sleep(sleep_time_seconds)
 
